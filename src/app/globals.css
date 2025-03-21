@@ -44,11 +44,11 @@ body {
     @apply border-2 border-slate-900
   }
   .page-container{
-    @apply relative top-[60px] max-w-[1280px] p-5 flex mx-auto
+    @apply relative top-[60px] max-w-[1280px] p-3 flex mx-auto xs:p-5
   }
   
   .todo-section {
-    @apply flex flex-col
+    @apply flex flex-col w-full md:w-1/2 
   }
 
 }
