@@ -12,6 +12,7 @@ const Header = () => {
       router.refresh()
     }
   }
+  
   return (
     <header className="w-screen h-[60px] pl-1/3 fixed top-0 bg-white border border-slate-200 flex justify-center">
       <div className="max-w-[1200px] w-full px-5 h-full items-center hidden xs:flex">

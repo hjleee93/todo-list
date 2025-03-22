@@ -10,7 +10,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 type AddTodo = Pick<ITodo, "name">;
 const API_URL = process.env.NEXT_PUBLIC_API_URL!
 
-export default function Home() {
+const Home = () => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [todoList, setTodoList] = useState<ITodo[]>([])
   const [doneList, setDoneList] = useState<ITodo[]>([])
@@ -34,7 +34,7 @@ export default function Home() {
 
   if (isLoading) {
     return <p>로딩 중...</p>
-  }
+    }
   
   if (isError) {
     return <p>에러가 발생했습니다</p>
@@ -75,6 +75,14 @@ export default function Home() {
       }
     }
   }
+
+  const handleStatusUpdate = (id: string, isCompleted: boolean) => {
+    setTodoList(prevList => prevList.map(todo => todo.id === id ? {...todo, isCompleted} : todo))
+    setDoneList(prevList => prevList.map(todo => todo.id === id ? {...todo, isCompleted} : todo))
+   
+    queryClient.invalidateQueries({ queryKey: ['todoData'] })
+  }
+
   return (
     <div className="page-container flex-col">
       <div className="flex flex-row w-full my-3 gap-2 xs:gap-5">
@@ -92,9 +100,11 @@ export default function Home() {
             추가하기</Button>
       </div>
       <div className="pt-7 pb-5 flex flex-col md:flex-row gap-5" >
-      <Todo todoList={todoList}/>
-      <Done todoList={doneList}/>
+      <Todo todoList={todoList} onStatusUpdate={handleStatusUpdate}/>
+      <Done todoList={doneList} onStatusUpdate={handleStatusUpdate}/>
       </div>
     </div>
   );
 }
+
+export default Home;

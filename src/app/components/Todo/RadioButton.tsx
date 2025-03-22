@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState, forwardRef } from "react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { twMerge } from 'tailwind-merge'
+import { useQueryClient } from "@tanstack/react-query";
 
 type RadioButtonProps = ButtonProps & {
   classNames?: {
@@ -15,7 +16,7 @@ type RadioButtonProps = ButtonProps & {
   }
   todo: ITodo,
   isEditing?: boolean // 수정 모드 여부
-  onNameUpdate?: (name: string) => void // 이름 수정 시 호출
+  onStatusUpdate?: (id: string, isCompleted: boolean) => void // 상태 수정 시 호출
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!
@@ -29,15 +30,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL!
  * @param props 기타 속성
  * @returns 
  */
-const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(({classNames, children, todo, isEditing = false, onNameUpdate, ...props}, ref) => {
+const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(({classNames, children, todo, isEditing = false, onStatusUpdate, ...props}, ref) => {
   const [isCompleted, setIsCompleted] = useState(todo.isCompleted)
   const [name, setName] = useState(todo.name)
 
   const router = useRouter()
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     setIsCompleted(todo.isCompleted)
-  
   }, [todo.isCompleted])
 
   const handleTodoStatus = async () => {
@@ -52,6 +53,8 @@ const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(({classNames,
     })
     if(res.ok) {
       setIsCompleted(!isCompleted)
+      onStatusUpdate?.(todo.id, !isCompleted)
+      queryClient.invalidateQueries({ queryKey: ['todoData'] })
     }
   }
   
@@ -64,8 +67,6 @@ const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(({classNames,
     router.push(`/items/${todo.id}`)
   }
 
-  
-  
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setName(value); 
@@ -96,7 +97,10 @@ const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(({classNames,
             className="underline max-w-full break-words text-center focus-visible:outline-none"
           />
         ) : (
-          <span className={isCompleted ? "line-through" : ""}>{todo.name}</span>
+          <span className={clsx(
+            "max-w-[calc(100%-35px)] break-words text-center",
+            isCompleted ? "line-through" : ""
+          )}>{todo.name}</span>
         )}
       </div>
     </button>

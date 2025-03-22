@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://cdn.jsdelivr.net/npm/font-nanum@1.0/nanumsquare.css');
 
 :root {
   --background:#F1F5F9;
@@ -7,7 +8,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'NanumSquare', Arial, Helvetica, sans-serif;
 }
 
 
