@@ -7,21 +7,27 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>
 
 export type CustomButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   iconType: IconType;
+  isTextHidden?: boolean;
 }
 
-const Button = ({ className, children, iconType,  ...props }: CustomButtonProps) => {
+const Button = ({ className, children, iconType, isTextHidden = true, ...props }: CustomButtonProps) => {
 
+  /**
+   * 버튼 아이콘 이미지 타입에 따라 실제 사용할 아이콘 파일명을 반환하는 함수
+   * @param icon 버튼 아이콘 이미지 타입
+   * @returns 실제 사용할 아이콘 파일명
+   */
   const getIcon = (icon: IconType) => {
     if (icon === "plus_black" || icon === "plus_white") {
       return 'plus'
     }
     return icon
   }
-  
+
   return (
     <>
       <button className={clsx(
-        "rounded-3xl text-base border-bold btn-shadow",
+        "flex justify-center items-center rounded-3xl text-base border-bold btn-shadow cursor-pointer",
         "min-w-[56px] h-[56px] xs:w-[162px]",
         className
       )}
@@ -34,7 +40,7 @@ const Button = ({ className, children, iconType,  ...props }: CustomButtonProps)
             height={16}
             className={iconType === "plus_black" ? "invert" : ""}
           />
-          <span className="hidden xs:block ">
+          <span className={clsx("xs:block", isTextHidden && "hidden")}>
           {children}
           </span>
         </div>
