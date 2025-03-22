@@ -44,7 +44,7 @@ body {
     @apply border-2 border-slate-900
   }
   .page-container{
-    @apply relative top-[60px] max-w-[1280px] p-3 flex mx-auto xs:p-5
+    @apply relative top-[60px] max-w-[1200px] p-3 flex mx-auto xs:p-5
   }
   
   .todo-section {
@@ -53,3 +53,17 @@ body {
 
 }
 
+
+/* 텍스트 스크롤바 스타일 */
+textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: #FDE68A;
+  border-radius: 10px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background-color: transparent;
+}
