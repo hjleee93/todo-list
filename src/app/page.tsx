@@ -18,7 +18,7 @@ const Home = () => {
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['todoData'],
+    queryKey: ['todoList'],
     queryFn: async () => {
       const res = await fetch(`${API_URL}/items`)
       return res.json()
@@ -40,7 +40,10 @@ const Home = () => {
     return <p>에러가 발생했습니다</p>
   }
   
-  
+  /**
+   * 할 일 추가
+   * 
+   */
   const addTodo = async (body: AddTodo ) => {
     if(body.name.trim() === '') return
     const res = await fetch(`${API_URL}/items`, {
@@ -53,18 +56,25 @@ const Home = () => {
 
     if(res.ok) {
       const data = await res.json()
-      setTodoList(prevList => [...prevList, data]);
+      setTodoList(prevList => [data, ...prevList]);
       inputRef.current!.value = ''
-      queryClient.invalidateQueries({ queryKey: ['todoData'] })
+      queryClient.invalidateQueries({ queryKey: ['todoList'] })
     }
 
   }
 
+  /**
+   * 할 일 추가
+   */
   const handleAddTodo = () => {
     const name = inputRef.current?.value || ''
     addTodo({name})
   }
 
+  /**
+   * 할 일 추가
+   * 엔터 키 눌렀을 때 할 일 추가
+   */
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       try {
@@ -76,11 +86,14 @@ const Home = () => {
     }
   }
 
+  /**
+   * 할 일 상태 업데이트
+   */
   const handleStatusUpdate = (id: string, isCompleted: boolean) => {
     setTodoList(prevList => prevList.map(todo => todo.id === id ? {...todo, isCompleted} : todo))
     setDoneList(prevList => prevList.map(todo => todo.id === id ? {...todo, isCompleted} : todo))
    
-    queryClient.invalidateQueries({ queryKey: ['todoData'] })
+    queryClient.invalidateQueries({ queryKey: ['todoList'] })
   }
 
   return (

@@ -3,7 +3,7 @@
 import Button from "@/app/components/Button";
 import ImageUploader from "@/app/components/ImageUploader";
 import RadioButton from "@/app/components/Todo/RadioButton";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react";
@@ -21,7 +21,7 @@ const ItemPage = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   
-  
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['todoItem', id],
@@ -30,6 +30,7 @@ const ItemPage = () => {
       return res.json()
     },
   })
+
 
   if (isLoading) {
     return <p>로딩 중...</p>
@@ -65,11 +66,16 @@ const ItemPage = () => {
     return res.json()
   }
 
+  /**
+   * 할 일 삭제
+   * 할 일 삭제 후 투두 목록 페이지로 이동
+   */
   const handleDelete = async () => {
     const res = await fetch(`${API_URL}/items/${id}`, {
       method: 'DELETE',
     })
     if (res.ok) {
+      queryClient.invalidateQueries({ queryKey: ['todoList'] })
       alert('삭제되었습니다.')
       router.push('/')
     }
@@ -82,7 +88,7 @@ const ItemPage = () => {
    * 이미지 파일 있는 경우 이미지 업로드 후 업로드 된 이미지 주소 저장
    */
   const handleUpdate = async () => {
-    let imageUrl = data.imageUrl
+    let imageUrl = data.imageUrl || ''
     if (imageFile) {
       const res: {url: string} = await handleAddImage(imageFile);
       imageUrl = res.url
@@ -102,6 +108,10 @@ const ItemPage = () => {
       }),
     })
     if (res.ok) {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['todoItem', id] }),
+        queryClient.invalidateQueries({ queryKey: ['todoList'] }),
+      ])
       alert('수정되었습니다.')
     }
   }
@@ -111,7 +121,7 @@ const ItemPage = () => {
       <RadioButton
         classNames={{
           wrapper: "rounded-[24px] h-[64px] flex justify-center text-xl",
-          inputContainer: "justify-center max-w-full ",
+          inputContainer: "justify-center max-w-full",
                 }}
         isEditing={true}
         todo={data}
@@ -160,8 +170,6 @@ const ItemPage = () => {
     </div>
     </ImageUploader>
     }
-        
-        
         <div className="bg-[url('/images/memo.png')] bg-cover bg-center w-full md:w-[588px] h-[311px] rounded-3xl flex flex-col p-5">
           <p className="text-amber-800 text-bold text-center mt-3">Memo</p>
           <textarea

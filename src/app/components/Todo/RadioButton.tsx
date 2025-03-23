@@ -41,6 +41,9 @@ const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(({classNames,
     setIsCompleted(todo.isCompleted)
   }, [todo.isCompleted])
 
+  /**
+   * 할 일 상태 업데이트
+   */
   const handleTodoStatus = async () => {
     const res = await fetch(`${API_URL}/items/${todo.id}`, {
     method:'PATCH',
@@ -54,10 +57,13 @@ const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(({classNames,
     if(res.ok) {
       setIsCompleted(!isCompleted)
       onStatusUpdate?.(todo.id, !isCompleted)
-      queryClient.invalidateQueries({ queryKey: ['todoData'] })
+      queryClient.invalidateQueries({ queryKey: ['todoList'] })
     }
   }
-  
+
+  /**
+   * 할 일 클릭 이벤트
+   */
   const handleTodoClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const target = event.target as HTMLElement;
     if (target.tagName === 'IMG') { //체크 항목 클릭시 페이지 이동 방지
@@ -67,6 +73,9 @@ const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(({classNames,
     router.push(`/items/${todo.id}`)
   }
 
+  /**
+   * 할 일 이름 변경 이벤트
+   */
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setName(value); 
